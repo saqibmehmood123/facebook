@@ -1,23 +1,23 @@
-package com.example.facebookclone.model;
+package com.example.facebookclone.dtos;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity
-public class Posts {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PostDto
+{
     private Long id;
+
     private Long userId;
     private String content;
-    private LocalDate createdAt;
-    // getters and setters
+    private String createdAt;
+    public PostDto() {
 
+    }
+    public PostDto(Long id, Long userId, String content, String createdAt) {
+        this.id = id;
+        this.userId = userId;
+        this.content = content;
+        this.createdAt = createdAt;
+    }
 
     public Long getId() {
         return id;
@@ -43,11 +43,11 @@ public class Posts {
         this.content = content;
     }
 
-    public LocalDate getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,7 +16,7 @@ public class Comment {
     private Long postId;
     private Long userId;
     private String content;
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
     // getters and setters
 
 
@@ -51,11 +52,11 @@ public class Comment {
         this.content = content;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 }
