@@ -4,6 +4,8 @@ import com.example.facebookclone.fiegnclient.CommmentsClient;
 import com.example.facebookclone.mapstruct.UserMapper;
 import com.example.facebookclone.requestpayload.PostIdListRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.example.facebookclone.repository.UserRepository;
 import  com.example.facebookclone.fiegnclient.PostClient;
@@ -31,13 +33,26 @@ public class UserService
     @Autowired
     UserMapper userMapper;
 
+    public UserDto getUserByEmail(String  email) throws ResourceNotFoundException {
+        System.out.println(" this is getUserBYemail in service not controller "+email);
+
+        Users user = userRepository.findByEmail(email);//.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+     System.out.println(" this is getUserBYemail in service not controller "+user.getEmail());
+        return         userMapper.userToUsersDto(user);
+    }
+
+
+
+
     public UserDTO getUserWithPosts(Long userId) throws ResourceNotFoundException {
         Users user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
 
-        System.out.println(" this is user name " + user.getName() );
+        System.out.println(" this is user name  +++++++++++++++++++++ " + user.getName() );
         // Fetch posts from post-service using Feign client
         List<PostDto> posts = postClient.getPostsByUserId(userId);
+//        List<PostDto> posts = postClient.getPostsByUserId(userId,fetchTokenSecurityContext());
+
         System.out.println(" this is posts  " + posts.get(0).getContent() );
         // Map User entity to UserDTO
 
@@ -46,49 +61,12 @@ public class UserService
     }
 
 
-    public UserDTO getPostsAndCommentsByUserId(Long userId) throws ResourceNotFoundException {
-      //  Users user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-    List<Users> listUser =     userRepository.findByIdIn(Arrays.asList(new Long(1),
-                new Long(2)
-
-        ));
-
-        System.out.println(" totalSize " + listUser.size() );
-        // Fetch posts from post-service using Feign client
-
-        PostIdListRequest commentsDtoIds = new PostIdListRequest();
-        commentsDtoIds.setPostIds(Arrays.asList(new Long(1),
-                new Long(2)
-
-
-        ));
-       List<PostDto> posts =  postClient.getPostsByUsersId(commentsDtoIds);
-        System.out.println(" this is posts size " + posts.size() );
-//
-        // Map User entity to UserDTO
-
-      ////  postIds
-         commentsDtoIds = new PostIdListRequest();
-        commentsDtoIds.setPostIds(Arrays.asList(new Long(1),
-                new Long(2),
-                new Long(3),
-                new Long(4)
-
-        ));
-       List<CommentDto> list =    commmentsClient.findByPostsIds(commentsDtoIds);
-        System.out.println(" this is CommentDto size " + list.size() );
-        return         userMapper.userAndPostsToUserDto(null,posts);
-    }
-
-
-
     public UserDTO createUser(UserDTO user) throws ResourceNotFoundException {
 
 
         Users user1 =  userRepository.save( userMapper.userDtoToUser(user) );
 
-
+System.out.println(" this is createUser --- ");
         return        userMapper.userToUserDto(user1);
     }
 

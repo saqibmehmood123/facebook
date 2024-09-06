@@ -1,0 +1,122 @@
+The behavior you're observing, where public UserDetails
+loadUserByUsername(String email) is called automatically when you perform authentication,
+is a core feature of Spring Security. This is part of how Spring Security manages the
+authentication process.
+
+Explanation of the Process
+Here’s a step-by-step breakdown of how this works:
+
+AuthenticationManager: This is a core interface in Spring Security that defines the
+authenticate method. When you call authenticationManager.authenticate(...), Spring Security
+ starts the authentication process.
+
+AuthenticationToken: The UsernamePasswordAuthenticationToken is a specific implementation of
+AuthenticationToken used to capture the user’s credentials (username and password) during
+ the authentication process. In your case, you’re passing in the email and password from
+ the request.
+
+AuthenticationProvider: The AuthenticationManager delegates the authentication process to an
+ AuthenticationProvider. The most commonly used implementation of AuthenticationProvider is
+ DaoAuthenticationProvider.
+
+DaoAuthenticationProvider: This is a specific implementation of AuthenticationProvider that
+ retrieves user details from a backend user repository. It’s designed to work with a
+ UserDetailsService.
+
+UserDetailsService: When the DaoAuthenticationProvider is used, it needs to load user details
+ from a data source. It does this through the UserDetailsService interface, which has a
+ single method: UserDetails loadUserByUsername(String username).
+
+loadUserByUsername Method: When the DaoAuthenticationProvider is performing the
+authentication, it automatically calls the loadUserByUsername(String email) method from the
+UserDetailsService to fetch the user's details from the database or any other persistent
+storage.
+
+UserDetails: The UserDetails object returned by loadUserByUsername contains necessary
+information like username, password, authorities, and account status. This is then used by
+ the DaoAuthenticationProvider to verify the credentials provided by the user.
+
+Why Does This Happen Automatically?
+Configuration by Convention: Spring Security is configured to follow a convention where,
+by default, it expects a UserDetailsService implementation to be provided. When you define
+ a UserDetailsService bean in your application context, Spring Security automatically wires
+  this into the authentication process.
+Delegation and Abstraction: The AuthenticationManager delegates to the
+AuthenticationProvider, which further uses the UserDetailsService to abstract away the
+details of how user information is loaded, allowing for flexibility and ease of integration
+ with different data sources.
+Concept Name
+The concept behind this automatic method invocation is called Inversion of Control (IoC),
+ and more specifically, it’s a part of Dependency Injection (DI) and Template Method Pattern
+  in Spring Framework. The Template Method Pattern in Spring Security’s authentication
+   process defines the skeleton of the authentication process but delegates certain steps
+   (like loading user details) to user-provided implementations
+    (like your UserDetailsService).
+
+Implementation Example
+Here is a simplified example of how these pieces fit together in code:
+
+UserDetailsService Implementation:
+
+java
+Copy code
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), new ArrayList<>());
+    }
+}
+AuthenticationManager Configuration:
+
+java
+Copy code
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+
+    @Bean
+    public AuthenticationManager customAuthenticationManager() throws Exception {
+        return authenticationManager();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService);
+    }
+}
+Using the AuthenticationManager:
+
+java
+Copy code
+@RestController
+public class AuthController {
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<?> authenticateUser(@RequestBody AuthRequest request) {
+        Authentication authenticate = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+        // Proceed with generating JWT, etc.
+    }
+}
+Summary
+The reason loadUserByUsername is called automatically is due to the configuration of
+Spring Security and its reliance on the UserDetailsService for user authentication.
+The AuthenticationManager and DaoAuthenticationProvider are configured to use this
+service to load user details and perform authentication. By following this convention
+and extending UserDetailsService, you allow Spring Security to automatically handle the
+retrieval of user details, enabling secure and flexible authentication management.

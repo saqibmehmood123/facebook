@@ -6,6 +6,7 @@ package com.example.facebookclone.web;
 import com.example.facebookclone.dtos.CommentDto;
 import com.example.facebookclone.model.Comment;
 import com.example.facebookclone.requestdto.PostIdListRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import com.example.facebookclone.services.CommentService;
 @RestController
 @RequestMapping("/comments")
+@Slf4j
 public class CommentController {
 
     @Autowired
@@ -37,6 +39,9 @@ public class CommentController {
     @PostMapping("/findByPostId")
     public List<CommentDto> findByPostsIds(@RequestBody PostIdListRequest postIdListRequest) {
 
+
+                log.info(" findByPostsIds {}");
+                int a=5/0;
        System.out.println(" this is find by posts , all posts ");
         return commentService.findByPostIds(postIdListRequest.getPostIds());
     }

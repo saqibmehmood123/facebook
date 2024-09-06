@@ -1,0 +1,113 @@
+services:
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - facebook-network
+#  zipkin:
+#    image: ghcr.io/openzipkin/zipkin-slim:${TAG:-latest}
+#    container_name: zipkin
+#    # Environment settings are defined here https://github.com/openzipkin/zipkin/blob/master/zipkin-server/README.md#environment-variables
+#    environment:
+#      - STORAGE_TYPE=mem
+#      # Uncomment to enable self-tracing
+#      - SELF_TRACING_ENABLED=true
+#      # Uncomment to increase heap size
+#      # - JAVA_OPTS=-Xms128m -Xmx128m -XX:+ExitOnOutOfMemoryError
+#    ports:
+#      # Port used for the Zipkin UI and HTTP Api
+#      - 9411:9411
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    networks:
+      - facebook-network
+
+  user-service:
+    build:
+      context: ./Users
+      dockerfile: Dockerfile
+    ports:
+      - "8087:8087"
+    depends_on:
+      - eureka-server
+    networks:
+      - facebook-network
+    environment:
+#      - SPRING_ZIPKIN_BASE-URL=http://zipkin:9411
+      - SPRING_PROFILES_ACTIVE=docker
+  post-service:
+    build:
+      context: ./Posts
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"
+    depends_on:
+      - eureka-server
+    networks:
+      - facebook-network
+    environment:
+#      - SPRING_ZIPKIN_BASE-URL=http://zipkin:9411
+      - SPRING_PROFILES_ACTIVE=docker
+#
+#  comment-service:
+#    build:
+#      context: ./comments
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8086:8086"
+#    depends_on:
+#      - eureka-server
+#    networks:
+#      - facebook-network
+#    environment:
+#      - SPRING_ZIPKIN_BASE-URL=http://zipkin:9411
+#      - SPRING_PROFILES_ACTIVE=docker
+  auth-service:
+    build:
+        context: ./auth-service
+        dockerfile: Dockerfile
+    ports:
+        - "8091:8091"
+    depends_on:
+        - eureka-server
+        - user-service
+    networks:
+        - facebook-network
+    environment:
+      #      - SPRING_ZIPKIN_BASE-URL=http://zipkin:9411
+      - SPRING_PROFILES_ACTIVE=docker
+
+#  elasticsearch:
+#    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+#    environment:
+#      - discovery.type=single-node
+#    ports:
+#      - "9200:9200"
+#  logstash:
+#    image: docker.elastic.co/logstash/logstash:8.10.4
+#    volumes:
+#      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+#    ports:
+#        - "5044:5044"
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:8.10.4
+#    ports:
+#        - "5601:5601"
+
+networks:
+  facebook-network:
+    driver: bridge
+
+
+
+
+#  mvn package spring-boot:repackage

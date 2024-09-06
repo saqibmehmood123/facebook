@@ -3,6 +3,7 @@ package com.example.facebookclone.mapstruct;
 import com.example.facebookclone.dtos.PostDto;
 import com.example.facebookclone.dtos.UserDTO;
 
+import com.example.facebookclone.dtos.UserDto;
 import com.example.facebookclone.model.Users;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,6 +21,8 @@ public interface UserMapper
     UserDTO userAndPostsToUserDto(Users user , List<PostDto> postDtoList);
      Users userDtoToUser(UserDTO user );
     UserDTO userToUserDto(Users user );
+    UserDto userToUsersDto(Users user );
+
 
      List<UserDTO>  userListToUserDtoList( List<Users>  user );
 //    PostDto postToPostDtos(Posts user);

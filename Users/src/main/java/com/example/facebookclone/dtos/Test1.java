@@ -11,8 +11,8 @@ public class Test1
 
         // Create User DTOs
         List<UserDTO> userDtoList = Arrays.asList(
-                new UserDTO(1L, "Nasir" ,"mudzaf7"),
-                new UserDTO(2L, "AAmir" ,"mudzaf9")
+                new UserDTO(1L, "Nasir" ,"mudzaf7","saqib"),
+                new UserDTO(2L, "AAmir" ,"mudzaf9","saqib")
         );
 
         // Create Post DTOs

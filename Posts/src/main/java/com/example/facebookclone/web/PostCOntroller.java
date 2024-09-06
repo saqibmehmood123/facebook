@@ -5,6 +5,7 @@ package com.example.facebookclone.web;
 import com.example.facebookclone.dtos.PostDto;
 import com.example.facebookclone.mapstruct.PostMapper;
 import com.example.facebookclone.services.PostService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
+@Slf4j
+
 public class PostCOntroller {
 
     @Autowired
@@ -46,6 +49,8 @@ public class PostCOntroller {
     @PostMapping("/getPostsByUsersId" )
     public List<PostDto> getPostsByUsersId(@RequestBody PostIdListRequest postDtoRequest)
     {
+                log.info(" getPostsByUsersId {}");
+
         System.out.println(" this is paramter list " + postDtoRequest.getPostIds() );
         return postService.findAllByUserId(postDtoRequest.getPostIds());
     }
